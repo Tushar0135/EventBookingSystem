@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Import required JavaFX UI components -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Root container is VBox, stacking elements vertically -->
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.eventbookingsystem.controller.OrderHistoryController"
+      spacing="10">
+
+    <!-- Title of the page -->
+    <Label text="Order History" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+    <!--  Table displaying past orders placed by the current user -->
+    <TableView fx:id="orderTable" prefHeight="400">
+        <columns>
+            <!-- Each TableColumn displays a specific detail of the order -->
+            <TableColumn fx:id="orderNumberColumn" text="Order #" prefWidth="80"/>
+            <TableColumn fx:id="eventNameColumn" text="Event" prefWidth="150"/>
+            <TableColumn fx:id="venueColumn" text="Venue" prefWidth="100"/>
+            <TableColumn fx:id="dayColumn" text="Day" prefWidth="70"/>
+            <TableColumn fx:id="quantityColumn" text="Quantity" prefWidth="80"/>
+            <TableColumn fx:id="totalPriceColumn" text="Total Price" prefWidth="100"/>
+            <TableColumn fx:id="dateTimeColumn" text="Date/Time" prefWidth="150"/>
+        </columns>
+    </TableView>
+
+    <!--  Button that allows users to export their order history to a text file -->
+    <Button text="Export Orders" onAction="#handleExportOrders" />
+
+</VBox>

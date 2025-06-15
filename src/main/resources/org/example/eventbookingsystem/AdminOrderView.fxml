@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importing necessary JavaFX UI components -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Root layout: BorderPane divides UI into top, center, bottom -->
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.eventbookingsystem.controller.AdminOrderController"
+            prefWidth="900" prefHeight="600">
+
+    <!-- Top section: Title bar -->
+    <top>
+        <HBox alignment="CENTER">
+            <!-- Heading for admin orders page -->
+            <Label text="All Orders by All Users" style="-fx-font-size: 20px; -fx-padding: 15px;"/>
+        </HBox>
+    </top>
+
+    <!-- Center section: Table displaying all order details -->
+    <center>
+        <TableView fx:id="orderTable" prefHeight="500">
+            <columns>
+                <!-- Each column represents a specific detail in an order -->
+                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="100"/>
+                <TableColumn fx:id="orderNumberColumn" text="Order #" prefWidth="80"/>
+                <TableColumn fx:id="eventNameColumn" text="Event" prefWidth="120"/>
+                <TableColumn fx:id="venueColumn" text="Venue" prefWidth="100"/>
+                <TableColumn fx:id="dayColumn" text="Day" prefWidth="80"/>
+                <TableColumn fx:id="quantityColumn" text="Qty" prefWidth="60"/>
+                <TableColumn fx:id="totalPriceColumn" text="Total ($)" prefWidth="80"/>
+                <TableColumn fx:id="dateTimeColumn" text="Date and Time" prefWidth="180"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Bottom section: Close button to exit this order view window -->
+    <bottom>
+        <HBox alignment="CENTER">
+            <!-- Exports all orders in a file-->
+            <Button text="Export All Orders" onAction="#handleExportAllOrders"/>
+            <!-- Closes the order view and returns to previous screen -->
+            <Button text="Close" onAction="#handleClose" />
+        </HBox>
+    </bottom>
+</BorderPane>

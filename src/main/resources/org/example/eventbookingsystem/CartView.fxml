@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importing JavaFX layout and control classes -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Root layout for the cart screen -->
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.eventbookingsystem.controller.CartController">
+
+    <!-- Center section holds everything in a vertical layout -->
+    <center>
+        <VBox fx:id="root" spacing="10">
+
+            <!-- Table displaying the current items in the cart -->
+            <TableView fx:id="cartTable" prefHeight="300">
+                <columns>
+                    <!-- Columns to show details for each cart item -->
+                    <TableColumn text="Event" fx:id="eventNameColumn" prefWidth="150"/>
+                    <TableColumn text="Venue" fx:id="venueColumn" prefWidth="120"/>
+                    <TableColumn text="Day" fx:id="dayColumn" prefWidth="100"/>
+
+                    <TableColumn text="Price" fx:id="priceColumn" prefWidth="80"/>
+                    <TableColumn text="Quantity" fx:id="quantityColumn" prefWidth="80"/>
+                    <TableColumn text="Total" fx:id="totalPriceColumn" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <!-- Section showing the total amount for all cart items -->
+            <HBox spacing="10">
+                <Label text="Total Amount:"/>
+                <Label fx:id="totalAmountLabel" style="-fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- Action buttons for cart management -->
+            <HBox spacing="10">
+                <Button text="Checkout" onAction="#handleCheckout"/>
+                <Button text="Update Quantity" onAction="#handleUpdateQuantity"/>
+                <Button text="Remove Item" onAction="#handleRemoveItem"/>
+                <Button text="Close" onAction="#handleClose"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

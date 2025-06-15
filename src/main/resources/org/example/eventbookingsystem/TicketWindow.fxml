@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importing core JavaFX UI controls and layout managers -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- This is the layout for the ticket booking popup window -->
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.eventbookingsystem.controller.TicketController">
+
+    <children>
+        <!-- VBox used to stack elements vertically in the center with spacing -->
+        <VBox fx:id="root" alignment="CENTER" spacing="15"
+              AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10"
+              AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10">
+
+            <!-- Displays the event name -->
+            <Label fx:id="eventLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+            <!--  Shows the number of available tickets -->
+            <Label fx:id="availableTicketsLabel" />
+
+            <!--  Displays any message related to validation or errors -->
+            <Label fx:id="statusLabel" text="" />
+
+            <!-- User inputs the number of tickets they want to buy -->
+            <HBox spacing="10">
+                <Label text="Enter Ticket Quantity:"/>
+                <TextField fx:id="quantityField" promptText="e.g. 2"/>
+            </HBox>
+
+            <!-- Button to add the selected number of tickets to the cart -->
+            <Button text="Add to Cart" onAction="#handleAddToCart"/>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Import JavaFX UI elements required -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Root layout is BorderPane with top, center, and bottom sections -->
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.eventbookingsystem.controller.EventController">
+
+    <!--  Top Section: Title/Header -->
+    <top>
+        <VBox spacing="10" alignment="CENTER">
+            <Label fx:id="welcomeLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <Label text="Event Booking System" style="-fx-font-size: 16px;" />
+        </VBox>
+    </top>
+
+    <!--  Center Section: Event Table -->
+    <center>
+        <TableView fx:id="eventTable" prefHeight="400" prefWidth="800">
+            <columns>
+                <!-- Each column shows part of event information -->
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="100" />
+                <TableColumn fx:id="venueColumn" text="Venue" prefWidth="100" />
+                <TableColumn fx:id="dayColumn" text="Day" prefWidth="100" />
+                <TableColumn fx:id="priceColumn" text="Price" prefWidth="100" />
+                <TableColumn fx:id="soldTicketsColumn" text="Sold Tickets" prefWidth="100" />
+                <TableColumn fx:id="totalTicketsColumn" text="Total Tickets" prefWidth="100" />
+                <TableColumn fx:id="availableTicketsColumn" text="Available Tickets" prefWidth="120" />
+            </columns>
+        </TableView>
+    </center>
+
+    <!--  Bottom Section: Action Buttons -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="15">
+
+            <!-- Visible to All -->
+            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout" />
+
+            <!-- User-Only Functionality -->
+            <Button fx:id="cartButton" text="View Cart" onAction="#handleViewCart" />
+
+            <!--  Shared Features (Admin & User) -->
+            <Button text="View Orders" onAction="#handleViewOrders" />
+            <Button text="Change Password" onAction="#handleChangePassword" />
+
+            <!-- Admin-Only Controls (Initially hidden) -->
+            <Button fx:id="disableEventButton" text="Disable Event" onAction="#handleDisableEvent" visible="false" />
+            <Button fx:id="enableEventButton" text="Enable Event" onAction="#handleEnableEvent" visible="false" />
+        </HBox>
+    </bottom>
+</BorderPane>

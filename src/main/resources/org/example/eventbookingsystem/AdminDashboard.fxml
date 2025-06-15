@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importing required JavaFX UI elements -->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!-- This FXML defines the layout for the Admin Dashboard view -->
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.eventbookingsystem.controller.AdminController"
+            prefWidth="900" prefHeight="600">
+
+    <!-- Top Section: Admin Header and Add Event Form -->
+    <top>
+        <VBox spacing="10" >
+            <Label text="Admin Dashboard - Manage Events" style="-fx-font-size: 22px;" />
+
+            <GridPane hgap="10" vgap="8">
+                <!-- Event Name -->
+                <Label text="Event Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="nameField" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+                <!-- Venue -->
+                <Label text="Venue:" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <TextField fx:id="venueField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <!-- Day -->
+                <Label text="Day (e.g., Mon):" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <TextField fx:id="dayField" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+
+                <!-- Price -->
+                <Label text="Price:" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                <TextField fx:id="priceField" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                <!-- Total Capacity -->
+                <Label text="Total Capacity:" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                <TextField fx:id="capacityField" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+
+                <!-- Add Button -->
+                <Button text="Add Event" onAction="#handleAddEvent"
+                        GridPane.columnIndex="5" GridPane.rowIndex="1"/>
+            </GridPane>
+        </VBox>
+    </top>
+    <!-- Center Section: Table to display grouped events -->
+    <center>
+        <TableView fx:id="groupedEventTable" prefHeight="400">
+            <columns>
+                <!-- These columns represent event grouping details -->
+                <TableColumn fx:id="nameColumn" text="Event Name" prefWidth="200"/>
+                <TableColumn fx:id="detailsColumn" text="Venue - Day" prefWidth="400"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Bottom Section: Action Buttons -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <!-- These buttons let the admin manage selected event rows -->
+            <Button text="Disable Selected" onAction="#handleDisableEvent"/>
+            <Button text="Enable Selected" onAction="#handleEnableEvent"/>
+            <Button text="Delete Selected" onAction="#handleDeleteEvent"/>
+
+            <!-- Log out and view all orders -->
+            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"/>
+            <Button text="View All Orders" onAction="#handleViewAllOrders"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
