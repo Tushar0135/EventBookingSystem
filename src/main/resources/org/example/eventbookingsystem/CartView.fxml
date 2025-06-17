@@ -7,7 +7,6 @@
 <!-- Root layout for the cart screen -->
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.eventbookingsystem.controller.CartController">
-
     <!-- Center section holds everything in a vertical layout -->
     <center>
         <VBox fx:id="root" spacing="10">
@@ -37,6 +36,7 @@
                 <Button text="Checkout" onAction="#handleCheckout"/>
                 <Button text="Update Quantity" onAction="#handleUpdateQuantity"/>
                 <Button text="Remove Item" onAction="#handleRemoveItem"/>
+                <Button fx:id="goToEventsButton" layoutX="20" layoutY="20" text="Events" onAction="#handleGoToEvents"/>
                 <Button text="Close" onAction="#handleClose"/>
             </HBox>
         </VBox>

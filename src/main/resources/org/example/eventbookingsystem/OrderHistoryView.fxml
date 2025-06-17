@@ -28,5 +28,6 @@
 
     <!--  Button that allows users to export their order history to a text file -->
     <Button text="Export Orders" onAction="#handleExportOrders" />
+    <Button fx:id="goToEventsButton" layoutX="20" layoutY="20" text="Events" onAction="#handleGoToEvents"/>
 
 </VBox>

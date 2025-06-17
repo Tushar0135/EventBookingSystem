@@ -1,28 +1,47 @@
 package org.example.eventbookingsystem.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.eventbookingsystem.model.CartItem;
+import org.example.eventbookingsystem.model.Event;
+import org.example.eventbookingsystem.model.User;
 import org.example.eventbookingsystem.utilities.DBUtil;
 import org.example.eventbookingsystem.utilities.Session;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class CartController {
-    @FXML private VBox root;
-    @FXML private TableView<CartItem> cartTable;
-    @FXML private TableColumn<CartItem, String> eventNameColumn;
-    @FXML private TableColumn<CartItem, String> venueColumn;
-    @FXML private TableColumn<CartItem, Integer> quantityColumn;
-    @FXML private TableColumn<CartItem, Double> totalPriceColumn;
-    @FXML private TableColumn<CartItem, Double> priceColumn;
-    @FXML private Label totalAmountLabel;
-    @FXML private TableColumn<CartItem, String> dayColumn;
+    @FXML
+    private VBox root;
+    @FXML
+    private TableView<CartItem> cartTable;
+    @FXML
+    private TableColumn<CartItem, String> eventNameColumn;
+    @FXML
+    private TableColumn<CartItem, String> venueColumn;
+    @FXML
+    private TableColumn<CartItem, Integer> quantityColumn;
+    @FXML
+    private TableColumn<CartItem, Double> totalPriceColumn;
+    @FXML
+    private TableColumn<CartItem, Double> priceColumn;
+    @FXML
+    private Label totalAmountLabel;
+    @FXML
+    private Button goToEventsButton;
+    @FXML
+    private TableColumn<CartItem, String> dayColumn;
     private EventController eventController;
 
     // This sets the EventController reference, allowing cart updates to reflect in the event list
@@ -35,7 +54,6 @@ public class CartController {
     public void initialize() {
         System.out.println("Cart page initialized. Setting up the cart table...");
 
-        // Linking table columns to CartItem properties
         eventNameColumn.setCellValueFactory(new PropertyValueFactory<>("eventName"));
         venueColumn.setCellValueFactory(new PropertyValueFactory<>("venue"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
@@ -44,11 +62,34 @@ public class CartController {
         dayColumn.setCellValueFactory(new PropertyValueFactory<>("day"));
 
         String username = Session.getLoggedInUsername();
+
+        CartManager.getInstance().loadCartFromDB(username); // <- Ensures sync
         cartTable.getItems().setAll(CartManager.getInstance().getCartItems(username));
+
         double totalAmount = CartManager.getInstance().getTotalAmount(username);
         totalAmountLabel.setText(String.format("Total: $%.2f", totalAmount));
+    }
 
-        System.out.println("Cart loaded for user: " + username + " | Total amount: $" + totalAmount);
+    private void loadCartFromDB(String username) {
+        String query = "SELECT * FROM cart WHERE username = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("event_name");
+                String venue = rs.getString("event_venue");
+                String day = rs.getString("event_day");
+                double price = rs.getDouble("event_price");
+                int quantity = rs.getInt("quantity");
+
+                Event dummyEvent = new Event(0, name, venue, day, price, 0, 0, true);
+                CartItem item = new CartItem(dummyEvent, quantity, price);
+                CartManager.getInstance().addToCart(username, item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Called when the user clicks the "Checkout" button
@@ -123,7 +164,7 @@ public class CartController {
     private void handleUpdateQuantity() {
         CartItem selectedItem = cartTable.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            System.out.println(" Quantity update initiated for event: " + selectedItem.getEvent().getName());
+            System.out.println("Quantity update initiated for event: " + selectedItem.getEvent().getName());
 
             TextInputDialog dialog = new TextInputDialog(String.valueOf(selectedItem.getQuantity()));
             dialog.setTitle("Update Quantity");
@@ -147,15 +188,23 @@ public class CartController {
                         return;
                     }
 
+                    // ✅ Let CartManager handle full update
                     CartManager.getInstance().updateCartItemQuantity(
                             Session.getLoggedInUsername(),
-                            selectedItem.getEvent().getId(),
+                            selectedItem.getEventName(),
+                            selectedItem.getVenue(),
+                            selectedItem.getEvent().getDay(),
                             newQty
                     );
 
-                    cartTable.refresh();
+                    // ✅ Refresh Cart UI
+                    cartTable.getItems().clear();
+                    cartTable.getItems().addAll(CartManager.getInstance().getCartItems(Session.getLoggedInUsername()));
                     totalAmountLabel.setText(String.format("Total: $%.2f", CartManager.getInstance().getTotalAmount(Session.getLoggedInUsername())));
-                    eventController.loadEventsFromDB();
+
+                    if (eventController != null) {
+                        eventController.loadEventsFromDB();
+                    }
 
                     System.out.println("Quantity updated to " + newQty + " for event: " + selectedItem.getEvent().getName());
                 } catch (NumberFormatException e) {
@@ -189,6 +238,32 @@ public class CartController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    @FXML
+    private void handleGoToEvents(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/eventbookingsystem/events.fxml"));
+            Parent root = loader.load();
+
+            // Create a User object using session username
+            String username = Session.getLoggedInUsername();
+            User user = new User(username);  // Assuming User has a constructor User(String username)
+
+            EventController controller = loader.getController();
+            controller.setCurrentUser(user); // Correct type passed here
+            controller.loadEventsFromDB();   // Optional refresh
+
+            // Show the event page scene
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Event Dashboard");
+            stage.show();
+
+            System.out.println("Redirected to Events Page.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to redirect to Events Page.");
+        }
+    }
 
     // Removes an item from the cart
     @FXML
@@ -197,24 +272,29 @@ public class CartController {
         if (selectedItem != null) {
             System.out.println("Removing item: " + selectedItem.getEvent().getName() + " from cart.");
 
-            // Remove from cart memory
-            CartManager.getInstance().removeFromCart(Session.getLoggedInUsername(), selectedItem.getEvent().getId());
+            String username = Session.getLoggedInUsername();
 
-            // Refresh table
-            cartTable.getItems().remove(selectedItem);
+            // ✅ Only call the manager method to ensure centralized handling
+            CartManager.getInstance().removeFromCart(
+                    username,
+                    selectedItem.getEventName(),
+                    selectedItem.getVenue(),
+                    selectedItem.getEvent().getDay()
+            );
+
+            // ✅ Refresh frontend UI
             cartTable.getItems().clear();
-            cartTable.getItems().addAll(CartManager.getInstance().getCartItems(Session.getLoggedInUsername()));
+            cartTable.getItems().addAll(CartManager.getInstance().getCartItems(username));
+            totalAmountLabel.setText(String.format("Total: $%.2f", CartManager.getInstance().getTotalAmount(username)));
 
-            // Update total label
-            totalAmountLabel.setText(String.format("Total: $%.2f",
-                    CartManager.getInstance().getTotalAmount(Session.getLoggedInUsername())));
-
-            // Refresh event list if available
             if (eventController != null) {
-                eventController.loadEventsFromDB();
+                eventController.loadEventsFromDB(); // Refresh event list
             }
 
-            System.out.println("Item removed and cart updated.");
+            System.out.println("Item successfully removed from all layers.");
+        } else {
+            showAlert("Please select an item to remove.");
         }
     }
+
 }

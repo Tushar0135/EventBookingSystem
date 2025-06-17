@@ -27,7 +27,11 @@ public class User {
         // You might log this when a user object is created for debugging
         System.out.println("User object created for username: " + username);
     }
-
+    public User(String username) {
+        this.username = username;
+        this.preferredName = username; // Default fallback
+        System.out.println("User object created (light) for username: " + username);
+    }
     // Getters to access user info
 
     public String getUsername() {

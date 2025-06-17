@@ -2,12 +2,19 @@ package org.example.eventbookingsystem.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.example.eventbookingsystem.model.Order;
+import org.example.eventbookingsystem.model.User;
 import org.example.eventbookingsystem.utilities.Session;
 import org.example.eventbookingsystem.utilities.DBUtil;
 
@@ -29,7 +36,8 @@ public class OrderHistoryController {
     @FXML private TableColumn<Order, Integer> quantityColumn;
     @FXML private TableColumn<Order, Double> totalPriceColumn;
     @FXML private TableColumn<Order, String> dateTimeColumn;
-
+    @FXML
+    private Button goToEventsButton;
     /**
      * Called automatically when this screen is loaded.
      * It sets up the columns and loads the current user's orders into the table.
@@ -173,6 +181,32 @@ public class OrderHistoryController {
             }
         } else {
             System.out.println("User cancelled export operation.");
+        }
+    }
+    @FXML
+    private void handleGoToEvents(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/eventbookingsystem/events.fxml"));
+            Parent root = loader.load();
+
+            // Create a User object using session username
+            String username = Session.getLoggedInUsername();
+            User user = new User(username);  // Assuming User has a constructor User(String username)
+
+            EventController controller = loader.getController();
+            controller.setCurrentUser(user); // Correct type passed here
+            controller.loadEventsFromDB();   // Optional refresh
+
+            // Show the event page scene
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Event Dashboard");
+            stage.show();
+
+            System.out.println("Redirected to Events Page.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to redirect to Events Page.");
         }
     }
 }

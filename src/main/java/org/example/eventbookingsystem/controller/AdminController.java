@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.eventbookingsystem.model.CartItem;
+import org.example.eventbookingsystem.model.Event;
 import org.example.eventbookingsystem.utilities.DBUtil;
 import org.example.eventbookingsystem.utilities.Session;
 import java.sql.*;
@@ -22,7 +23,8 @@ public class AdminController {
     @FXML private TableColumn<GroupedEvent, String> nameColumn;
     @FXML private TableColumn<GroupedEvent, String> detailsColumn;
     @FXML private TableColumn<GroupedEvent, String> statusColumn;
-
+    @FXML private TableColumn<Event, String> venueColumn;
+    @FXML private TableView<Event> eventTable;
     @FXML private TextField nameField, venueField, dayField, priceField, capacityField;
     @FXML private Button logoutButton;
 
@@ -209,7 +211,37 @@ public class AdminController {
 
     // Called when admin enables or disables an event
     @FXML private void handleEnableEvent() { updateSelectedEventStatus(true); }
-    @FXML private void handleDisableEvent() { updateSelectedEventStatus(false); }
+    @FXML
+    private void handleDisableEvent() {
+        GroupedEvent selected = groupedEventTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Please select an event to disable.");
+            return;
+        }
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("UPDATE events SET enabled = false WHERE id = ?")) {
+            stmt.setInt(1, selected.getId());
+            stmt.executeUpdate();
+            System.out.println("Event disabled in database.");
+
+            // Cleanup from all carts
+            String name = selected.getActualName();
+            String[] venueDay = selected.getDetails().split(" - ");
+            String venue = venueDay[0];
+
+            String day = venueDay[1];
+            System.out.println("name= "+name+" venue= "+venue+" day= "+day);
+            CartManager.getInstance().preloadAllUserCarts();
+            CartManager.getInstance().removeEventFromAllCarts(name, venue, day);
+
+            loadGroupedEvents(); // refresh table
+            showAlert("Event disabled and removed from all carts.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Failed to disable event.");
+        }
+    }
 
     // Helper to enable/disable selected event
     private void updateSelectedEventStatus(boolean enable) {
@@ -381,6 +413,13 @@ public class AdminController {
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
